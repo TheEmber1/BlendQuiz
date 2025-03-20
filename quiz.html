@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlendQuiz - Test Your Skills</title>
+    <link rel="stylesheet" href="css/quiz.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <h1><i class='bx bxl-blender'></i> BlendQuiz</h1>
+            <div class="quiz-info">
+                <span id="difficulty-label">Difficulty: <span id="difficulty"></span></span>
+                <span id="progress-label">Question <span id="current-question">1</span>/5</span>
+            </div>
+        </header>
+        
+        <main>
+            <div id="quiz-container">
+                <div id="question-container">
+                    <h2 id="question">How do you bevel in Blender?</h2>
+                    <div class="answers">
+                        <button class="answer-btn"></button>
+                        <button class="answer-btn"></button>
+                        <button class="answer-btn"></button>
+                        <button class="answer-btn"></button>
+                    </div>
+                </div>
+                
+                <div id="results-container" class="hidden">
+                    <h2>Quiz Results</h2>
+                    <div class="results">
+                        <p>You got <span id="correct-count">0</span> out of 5 correct!</p>
+                        <div class="result-list">
+                            <ul id="result-answers"></ul>
+                        </div>
+                    </div>
+                    <button id="home-btn" class="btn">Back to Home</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/shortcuts.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/quiz.js"></script>
+</body>
+</html>

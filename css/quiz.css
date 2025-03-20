@@ -1,0 +1,251 @@
+:root {
+    --main-color: #7b6cf6;
+    --secondary-color: #9e93f5;
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --container-bg: #252525;
+    --correct-color: #4caf50;
+    --incorrect-color: #f44336;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    padding: 2rem;
+    background-color: var(--container-bg);
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: var(--main-color);
+    margin-bottom: 1rem;
+}
+
+.quiz-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#question-container {
+    text-align: center;
+}
+
+#question {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.answer-btn {
+    padding: 1rem;
+    border: 2px solid var(--main-color);
+    border-radius: 5px;
+    background-color: transparent;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.answer-btn:hover {
+    background-color: rgba(123, 108, 246, 0.2);
+}
+
+.answer-btn.correct {
+    background-color: var(--correct-color);
+    border-color: var(--correct-color);
+}
+
+.answer-btn.incorrect {
+    background-color: var(--incorrect-color);
+    border-color: var(--incorrect-color);
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--main-color);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 1.5rem;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-3px);
+}
+
+#results-container {
+    text-align: center;
+}
+
+.results {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.results p {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    text-align: left;
+}
+
+.result-details h3 {
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.result-details ul {
+    list-style-position: inside;
+}
+
+.result-details li {
+    margin-bottom: 0.5rem;
+}
+
+.result-list {
+    text-align: left;
+    margin-top: 1rem;
+}
+
+.result-list ul {
+    list-style-type: none;
+}
+
+.result-list li {
+    padding: 0.8rem;
+    border-radius: 5px;
+    margin-bottom: 0.8rem;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.result-list li.correct {
+    border-left: 4px solid var(--correct-color);
+}
+
+.result-list li.incorrect {
+    border-left: 4px solid var(--incorrect-color);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Stats cards for displaying difficulty and time */
+.quiz-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-title {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Remove the old completion time styling */
+.completion-time {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .answers {
+        grid-template-columns: 1fr;
+    }
+    
+    .result-details {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .quiz-stats {
+        grid-template-columns: 1fr;
+    }
+}
