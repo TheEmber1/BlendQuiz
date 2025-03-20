@@ -24,7 +24,7 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 0;
+    padding: 20px;
     overflow-x: hidden;
 }
 
@@ -41,11 +41,13 @@ body {
 .container {
     width: 100%;
     max-width: 1200px;
-    min-height: 100vh;
+    min-height: calc(100vh - 40px);
     padding: 2rem;
     background-color: var(--container-bg);
     display: flex;
     flex-direction: column;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 main {
@@ -345,9 +347,26 @@ header h1 {
 .skill-prodigy { border-left-color: #e91e63; }
 .skill-prodigy .skill-icon { background-color: rgba(233, 30, 99, 0.2); color: #e91e63; }
 
+.bonus-tag {
+    display: inline-block;
+    background-color: var(--pro-color);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
 @media (max-width: 700px) {
     .container {
         padding: 1rem;
+        min-height: calc(100vh - 20px);
+    }
+    
+    body {
+        padding: 10px;
     }
     
     #question {

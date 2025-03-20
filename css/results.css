@@ -1,0 +1,466 @@
+:root {
+    --main-color: #7b6cf6;
+    --secondary-color: #9e93f5;
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --container-bg: #252525;
+    --correct-color: #4caf50;
+    --incorrect-color: #f44336;
+    --noob-color: #4caf50;
+    --easy-color: #2196f3;
+    --intermediate-color: #ff9800;
+    --pro-color: #f44336;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    min-height: calc(100vh - 40px);
+    padding: 2rem;
+    background-color: var(--container-bg);
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--main-color);
+}
+
+header h1 i {
+    margin-right: 0.5rem;
+    font-size: 2rem;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.results-container {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.results-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    color: var(--main-color);
+}
+
+/* Skill level styling */
+.skill-level-container {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.skill-badge {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid var(--main-color);
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.skill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-size: 1.8rem;
+    background-color: rgba(123, 108, 246, 0.2);
+    color: var(--main-color);
+}
+
+.skill-content {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.skill-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.skill-desc {
+    font-size: 1rem;
+    color: #bbb;
+}
+
+/* Stats styling */
+.stats-container {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 1000px;
+    margin: 0 auto; /* Center the grid container */
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border-left: 4px solid var(--main-color);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-title {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Score donut chart */
+.score-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin: 0 auto 2rem auto; /* Center with auto margins */
+    max-width: 1000px;
+    text-align: center;
+}
+
+.score-donut {
+    position: relative;
+}
+
+.score-circle {
+    transform: rotate(-90deg);
+}
+
+.score-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 10;
+}
+
+.score-value {
+    fill: none;
+    stroke: var(--main-color);
+    stroke-width: 10;
+    stroke-dasharray: 502;
+    stroke-dashoffset: 502;
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.score-text {
+    fill: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    transform: rotate(90deg);
+}
+
+.score-label {
+    fill: #aaa;
+    font-size: 0.9rem;
+    transform: rotate(90deg);
+}
+
+.score-scale {
+    fill: #666;
+    font-size: 0.7rem;
+    transform: rotate(90deg);
+}
+
+.score-message {
+    max-width: 500px;
+    font-size: 1.1rem;
+    color: #ddd;
+    margin: 0 auto; /* Center-align the message */
+    text-align: center;
+}
+
+/* Answers tabs and list */
+.answers-container {
+    margin-bottom: 2rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.answers-container h3 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    color: var(--secondary-color);
+}
+
+.answers-tabs {
+    display: flex;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    justify-content: center; /* Center the tab buttons */
+}
+
+.tab-btn {
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 1rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--main-color);
+    border-bottom-color: var(--main-color);
+}
+
+.answers-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.answers-list ul {
+    list-style-type: none;
+}
+
+.answers-list li {
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.answers-list li.correct {
+    border-left: 4px solid var(--correct-color);
+}
+
+.answers-list li.incorrect {
+    border-left: 4px solid var(--incorrect-color);
+}
+
+/* Optional: Add a subtle gold border for bonus questions */
+.answers-list li.bonus {
+    border-right: 4px solid #ffc107;
+}
+
+.answer-icon {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.correct .answer-icon {
+    color: var(--correct-color);
+}
+
+.incorrect .answer-icon {
+    color: var(--incorrect-color);
+}
+
+.answer-content {
+    flex: 1;
+}
+
+.question-text {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+}
+
+.answer-text {
+    display: block;
+    color: #bbb;
+    font-size: 0.9rem;
+}
+
+.answer-key {
+    font-weight: bold;
+}
+
+/* Buttons */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.8rem 1.8rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--main-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-3px);
+}
+
+.btn-secondary {
+    background-color: rgba(123, 108, 246, 0.2);
+    color: var(--main-color);
+    border: 1px solid var(--main-color);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(123, 108, 246, 0.3);
+    transform: translateY(-3px);
+}
+
+footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    color: #999;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Skill level variants */
+.skill-novice { border-left-color: #f44336; }
+.skill-novice .skill-icon { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
+
+.skill-beginner { border-left-color: #ff9800; }
+.skill-beginner .skill-icon { background-color: rgba(255, 152, 0, 0.2); color: #ff9800; }
+
+.skill-casual { border-left-color: #ffc107; }
+.skill-casual .skill-icon { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; }
+
+.skill-comfortable { border-left-color: #8bc34a; }
+.skill-comfortable .skill-icon { background-color: rgba(139, 195, 74, 0.2); color: #8bc34a; }
+
+.skill-proficient { border-left-color: #4caf50; }
+.skill-proficient .skill-icon { background-color: rgba(76, 175, 80, 0.2); color: #4caf50; }
+
+.skill-advanced { border-left-color: #2196f3; }
+.skill-advanced .skill-icon { background-color: rgba(33, 150, 243, 0.2); color: #2196f3; }
+
+.skill-expert { border-left-color: #3f51b5; }
+.skill-expert .skill-icon { background-color: rgba(63, 81, 181, 0.2); color: #3f51b5; }
+
+.skill-master { border-left-color: #9c27b0; }
+.skill-master .skill-icon { background-color: rgba(156, 39, 176, 0.2); color: #9c27b0; }
+
+.skill-prodigy { border-left-color: #e91e63; }
+.skill-prodigy .skill-icon { background-color: rgba(233, 30, 99, 0.2); color: #e91e63; }
+
+/* Bonus tag style */
+.bonus-tag {
+    display: inline-block;
+    background-color: var(--pro-color);
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1.5rem;
+        min-height: calc(100vh - 20px);
+    }
+    
+    body {
+        padding: 10px;
+    }
+    
+    .score-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (min-width: 992px) {
+    .stat-cards {
+        grid-template-columns: repeat(4, 1fr);
+        justify-content: center; /* Ensure grid is centered on larger screens */
+    }
+}

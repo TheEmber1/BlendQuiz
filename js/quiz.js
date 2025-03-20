@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isAssessment) {
         document.getElementById('difficulty').textContent = 'Skill Assessment';
         document.querySelector('.quiz-info').innerHTML = `
-            <span id="progress-label">Question <span id="current-question">1</span>/12</span>
+            <span id="progress-label">Question <span id="current-question">1</span>/16</span>
             <span id="timer">Time: <span id="time-counter">0:00</span></span>
         `;
     } else {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = {
         currentQuestion: 0,
         score: 0,
-        totalQuestions: isAssessment ? 12 : 5,
+        totalQuestions: isAssessment ? 16 : 5,
         questions: [],
         results: {
             correct: [],
@@ -52,18 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Display the first question
     displayQuestion();
     
-    // Function to generate a set of assessment questions (3 from each difficulty)
+    // Function to generate a set of assessment questions (4 from each difficulty)
     function generateAssessmentQuestions() {
         const difficultyLevels = ['noob', 'easy', 'intermediate', 'pro'];
         let allQuestions = [];
         
-        // Get 3 questions from each difficulty level
+        // Update total questions count to 16 (4 from each of the 4 difficulty levels)
+        state.totalQuestions = 16;
+        
+        // Get 4 questions from each difficulty level
         difficultyLevels.forEach(level => {
             const levelShortcuts = [...shortcutsByDifficulty[level]];
             const shuffledShortcuts = levelShortcuts.sort(() => Math.random() - 0.5);
             
-            // Take 3 shortcuts from this level
-            const selectedShortcuts = shuffledShortcuts.slice(0, 3);
+            // Take 4 shortcuts from this level
+            const selectedShortcuts = shuffledShortcuts.slice(0, 4);
             
             // Create questions for each shortcut
             selectedShortcuts.forEach(shortcut => {
@@ -78,17 +81,42 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // Shuffle all questions to mix difficulty levels
-        state.questions = shuffleArray(allQuestions);
+        // Instead of shuffling, organize questions by difficulty level
+        // This will make questions go from easiest (noob) to hardest (pro)
+        const sortedQuestions = [];
+        
+        // Add questions from each difficulty level in order
+        difficultyLevels.forEach(level => {
+            // Get all questions for this difficulty level and shuffle them
+            const levelQuestions = allQuestions.filter(q => q.difficulty === level);
+            // Shuffle within the same difficulty level for variety
+            const shuffledLevelQuestions = shuffleArray(levelQuestions);
+            // Add these questions to our sorted array
+            sortedQuestions.push(...shuffledLevelQuestions);
+        });
+        
+        state.questions = sortedQuestions;
+        
+        // Update quiz info to show correct question count
+        if (document.getElementById('progress-label')) {
+            document.getElementById('progress-label').innerHTML = 
+                `Question <span id="current-question">1</span>/${state.totalQuestions}`;
+        }
     }
     
     // Function to generate regular quiz questions
     function generateQuestions(shortcuts) {
+        // Regular quiz will have 7 questions total (5 from selected difficulty + 2 pro)
+        state.totalQuestions = 7;
+        
         // Shuffle shortcuts to get random set
         const shuffledShortcuts = [...shortcuts].sort(() => Math.random() - 0.5);
         
         // Take the first 5 shortcuts (or fewer if not enough)
-        const questionCount = Math.min(state.totalQuestions, shuffledShortcuts.length);
+        const questionCount = Math.min(5, shuffledShortcuts.length);
+        
+        // Create array to hold our questions
+        const questionsArray = [];
         
         for (let i = 0; i < questionCount; i++) {
             const correctShortcut = shuffledShortcuts[i];
@@ -96,14 +124,57 @@ document.addEventListener('DOMContentLoaded', () => {
             // Generate 3 incorrect options
             const incorrectOptions = generateIncorrectOptions(correctShortcut);
             
-            // Add the question to our state
-            state.questions.push({
+            // Add the question to our array
+            questionsArray.push({
                 question: `What is the shortcut for "${correctShortcut.action}"?`,
                 correctAnswer: correctShortcut.key,
                 options: shuffleArray([...incorrectOptions, correctShortcut.key]),
                 difficulty: difficulty
             });
         }
+        
+        // Now add 2 Pro level questions at the end
+        // Get Pro shortcuts and shuffle them
+        const proShortcuts = [...shortcutsByDifficulty.pro].sort(() => Math.random() - 0.5);
+        
+        // Take 2 Pro shortcuts that aren't already used
+        let bonusCount = 0;
+        let proIndex = 0;
+        
+        while (bonusCount < 2 && proIndex < proShortcuts.length) {
+            const proShortcut = proShortcuts[proIndex];
+            
+            // Check if this shortcut is already used in our questions
+            const isAlreadyUsed = questionsArray.some(q => 
+                q.correctAnswer === proShortcut.key || 
+                q.question.includes(proShortcut.action)
+            );
+            
+            if (!isAlreadyUsed) {
+                // Generate incorrect options
+                const incorrectOptions = generateIncorrectOptions(proShortcut);
+                
+                // Add the Pro question
+                questionsArray.push({
+                    question: `What is the shortcut for "${proShortcut.action}"?`,
+                    correctAnswer: proShortcut.key,
+                    options: shuffleArray([...incorrectOptions, proShortcut.key]),
+                    difficulty: 'pro',
+                    isBonus: true
+                });
+                
+                bonusCount++;
+            }
+            
+            proIndex++;
+        }
+        
+        // Set the questions in our state
+        state.questions = questionsArray;
+        
+        // Update quiz info to show correct question count
+        document.getElementById('progress-label').innerHTML = 
+            `Question <span id="current-question">1</span>/${state.questions.length}`;
     }
     
     // Function to generate incorrect options for a question
@@ -134,8 +205,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update question number
         document.getElementById('current-question').textContent = state.currentQuestion + 1;
         
-        // Set question text
-        document.getElementById('question').textContent = question.question;
+        // Check if this is a bonus pro question and add a visual indicator
+        if (question.isBonus) {
+            document.getElementById('question').innerHTML = 
+                `<span class="bonus-tag">BONUS PRO</span> ${question.question}`;
+        } else {
+            document.getElementById('question').textContent = question.question;
+        }
         
         // Set answer options
         const answerButtons = document.querySelectorAll('.answer-btn');
@@ -221,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         originalCheckAnswer(selectedAnswer);
     };
     
-    // Function to show the final results
+    // Function to show the final results - modify this to redirect to results page
     function showResults() {
         // Stop the timer
         clearInterval(timer);
@@ -229,141 +305,79 @@ document.addEventListener('DOMContentLoaded', () => {
         // Record end time
         state.endTime = new Date();
         const timeTaken = Math.round((state.endTime - state.startTime) / 1000);
+        const formattedTime = formatTime(timeTaken);
         
-        // Hide question container and show results
-        document.getElementById('question-container').classList.add('hidden');
-        const resultsContainer = document.getElementById('results-container');
-        resultsContainer.classList.remove('hidden');
-        
-        // Update score
-        document.getElementById('correct-count').textContent = state.score;
-        
+        // Calculate skill level for assessment
+        let skillLevel = null;
+        let scorePoints = 0;
         if (isAssessment) {
-            // Calculate skill level based on score and time
-            const skillLevel = calculateSkillLevel(state.score, timeTaken);
-            
-            // Create the skill level element
-            const skillLevelElement = document.createElement('div');
-            skillLevelElement.className = 'skill-level';
-            skillLevelElement.innerHTML = `
-                <h3>Your Blender Skill Level:</h3>
-                <div class="skill-badge ${skillLevel.className}">
-                    <div class="skill-icon">
-                        <i class="${skillLevel.icon}"></i>
-                    </div>
-                    <div class="skill-content">
-                        <span class="skill-title">${skillLevel.title}</span>
-                        <span class="skill-desc">${skillLevel.description}</span>
-                    </div>
-                </div>
-            `;
-            
-            // Insert at the top of results
-            document.querySelector('.results').prepend(skillLevelElement);
+            scorePoints = calculateScorePoints(state.score, timeTaken);
+            skillLevel = calculateSkillLevel(scorePoints);
+        } else {
+            scorePoints = calculateScorePoints(state.score, timeTaken);
         }
         
-        // Add difficulty info with appropriate icon for regular quiz
-        if (!isAssessment) {
-            const difficultyIcon = getDifficultyIcon(difficulty);
-            const difficultyColor = getDifficultyColor(difficulty);
-            
-            const difficultyElement = document.createElement('div');
-            difficultyElement.className = 'quiz-stats';
-            difficultyElement.innerHTML = `
-                <div class="stat-card" style="border-left-color: ${difficultyColor}">
-                    <div class="stat-icon" style="background-color: rgba(${hexToRgb(difficultyColor)}, 0.2); color: ${difficultyColor}">
-                        <i class="${difficultyIcon}"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-title">Difficulty</span>
-                        <span class="stat-value">${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-title">Completion Time</span>
-                        <span class="stat-value">${formatTime(timeTaken)}</span>
-                    </div>
-                </div>
-            `;
-            
-            // Insert at the top of results
-            document.querySelector('.results').prepend(difficultyElement);
-        }
+        // Prepare results data to pass to the results page
+        const resultsData = {
+            isAssessment: isAssessment,
+            difficulty: difficulty,
+            score: state.score,
+            totalQuestions: state.totalQuestions,
+            correct: state.results.correct,
+            incorrect: state.results.incorrect,
+            completionTime: formattedTime,
+            completionSeconds: timeTaken,
+            scorePoints: scorePoints,
+            skillLevel: skillLevel
+        };
         
-        // Simplify results display
-        const resultsList = document.getElementById('result-answers');
-        resultsList.innerHTML = '';
+        // Save results to sessionStorage
+        sessionStorage.setItem('quizResults', JSON.stringify(resultsData));
         
-        // Add completion time to results
-        const timeElement = document.createElement('div');
-        timeElement.className = 'completion-time';
-        timeElement.innerHTML = `Completion Time: <span>${formatTime(timeTaken)}</span>`;
-        document.querySelector('.results p').after(timeElement);
-        
-        // First add correct answers
-        state.results.correct.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'correct';
-            const questionNumber = state.results.correct.indexOf(item) + state.results.incorrect.findIndex(x => 
-                state.questions.findIndex(q => q.question === x.question) < 
-                state.questions.findIndex(q => q.question === item.question)
-            ) + 1;
-            
-            const questionText = item.question.replace('What is the shortcut for "', '').replace('"?', '');
-            li.textContent = `Question ${questionNumber}: ${questionText} → ${item.answer}`;
-            resultsList.appendChild(li);
-        });
-        
-        // Then add incorrect answers
-        state.results.incorrect.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = 'incorrect';
-            const questionNumber = state.results.correct.filter(x => 
-                state.questions.findIndex(q => q.question === x.question) < 
-                state.questions.findIndex(q => q.question === item.question)
-            ).length + state.results.incorrect.indexOf(item) + 1;
-            
-            const questionText = item.question.replace('What is the shortcut for "', '').replace('"?', '');
-            li.textContent = `Question ${questionNumber}: ${questionText} → ${item.correctAnswer}`;
-            resultsList.appendChild(li);
-        });
-        
-        // Trigger fireworks at the end
-        setTimeout(() => {
-            if (typeof window.triggerFireworks === 'function') {
-                window.triggerFireworks();
-            }
-        }, 500);
-        
-        // Set up home button
-        document.getElementById('home-btn').addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
+        // Redirect to results page
+        window.location.href = 'results.html';
     }
     
-    // Function to calculate skill level based on score and time
-    function calculateSkillLevel(score, timeTaken) {
-        // Base skill points on correct answers (0-12 points)
-        let skillPoints = score;
+    // Helper function to calculate score points
+    function calculateScorePoints(score, timeTaken) {
+        const totalQuestions = state.totalQuestions;
         
-        // Add time bonus (up to 3 points)
-        // For perfect time (less than 60 seconds), award 3 points
-        // For good time (less than 120 seconds), award 2 points
-        // For decent time (less than 180 seconds), award 1 point
-        if (timeTaken < 60) {
-            skillPoints += 3;
-        } else if (timeTaken < 120) {
-            skillPoints += 2;
-        } else if (timeTaken < 180) {
-            skillPoints += 1;
+        // Accuracy score (0-80 points)
+        const accuracyScore = Math.round((score / totalQuestions) * 80);
+        
+        // Time bonus (0-20 points)
+        let timeBonus = 0;
+        
+        if (isAssessment) {
+            // For assessment mode (16 questions)
+            if (timeTaken < 45) {
+                timeBonus = 20; // Perfect speed - very fast!
+            } else if (timeTaken < 80) {
+                timeBonus = 15; // Very good speed
+            } else if (timeTaken < 160) {
+                timeBonus = 10; // Good speed
+            } else if (timeTaken < 240) {
+                timeBonus = 5;  // Average speed
+            }
+        } else {
+            // For regular quiz (5 questions)
+            if (timeTaken < 15) {
+                timeBonus = 20; // Perfect speed - 15 seconds for 5 questions
+            } else if (timeTaken < 30) {
+                timeBonus = 15; // Very good speed
+            } else if (timeTaken < 45) {
+                timeBonus = 10; // Good speed
+            } else if (timeTaken < 60) {
+                timeBonus = 5;  // Average speed
+            }
         }
         
-        // Define skill levels (from 15 possible points)
+        return accuracyScore + timeBonus;
+    }
+    
+    // Function to calculate skill level based on score points
+    function calculateSkillLevel(scorePoints) {
+        // Define skill levels based on 100-point scale
         const skillLevels = [
             {
                 threshold: 0,
@@ -373,56 +387,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 className: "skill-novice"
             },
             {
-                threshold: 2,
+                threshold: 20,
                 title: "Blender Beginner",
                 description: "You know a few basics, but have a lot to learn.",
                 icon: "fas fa-walking",
                 className: "skill-beginner"
             },
             {
-                threshold: 4,
+                threshold: 35,
                 title: "Casual User",
                 description: "You can find your way around, slowly but surely.",
                 icon: "fas fa-child",
                 className: "skill-casual"
             },
             {
-                threshold: 6,
+                threshold: 50,
                 title: "Comfortable User",
                 description: "You're getting comfortable with Blender's interface.",
                 icon: "fas fa-thumbs-up",
                 className: "skill-comfortable"
             },
             {
-                threshold: 8,
+                threshold: 65,
                 title: "Proficient User",
                 description: "You're working efficiently with Blender's tools.",
                 icon: "fas fa-user",
                 className: "skill-proficient"
             },
             {
-                threshold: 10,
+                threshold: 75,
                 title: "Advanced User",
                 description: "You know Blender well and work efficiently.",
                 icon: "fas fa-user-tie",
                 className: "skill-advanced"
             },
             {
-                threshold: 12,
+                threshold: 85,
                 title: "Blender Expert",
                 description: "You've mastered most of Blender's shortcuts.",
                 icon: "fas fa-user-graduate",
                 className: "skill-expert"
             },
             {
-                threshold: 14,
+                threshold: 95,
                 title: "Blender Master",
                 description: "You're lightning fast and incredibly knowledgeable!",
                 icon: "fas fa-crown",
                 className: "skill-master"
             },
             {
-                threshold: 15,
+                threshold: 100,
                 title: "Blender Prodigy",
                 description: "Wow! You're on Blender developer level!",
                 icon: "fas fa-medal",
@@ -432,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Find appropriate skill level based on points
         for (let i = skillLevels.length - 1; i >= 0; i--) {
-            if (skillPoints >= skillLevels[i].threshold) {
+            if (scorePoints >= skillLevels[i].threshold) {
                 return skillLevels[i];
             }
         }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlendQuiz - Your Results</title>
+    <link rel="stylesheet" href="css/results.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+    
+    <div class="container">
+        <header>
+            <h1><i class='bx bxl-blender'></i> BlendQuiz</h1>
+        </header>
+        
+        <main>
+            <div class="results-container">
+                <h2>Your Results</h2>
+                
+                <div id="skill-level-container" class="skill-level-container">
+                    <!-- Filled by JavaScript for skill assessment -->
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-cards">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="score-container">
+                    <div class="score-donut">
+                        <svg width="180" height="180" class="score-circle">
+                            <circle class="score-ring" cx="90" cy="90" r="80" />
+                            <circle class="score-value" cx="90" cy="90" r="80" />
+                            <text x="90" y="90" text-anchor="middle" dominant-baseline="middle" class="score-text"></text>
+                            <text x="90" y="115" text-anchor="middle" dominant-baseline="middle" class="score-label">Points</text>
+                            <text x="90" y="130" text-anchor="middle" dominant-baseline="middle" class="score-scale">/100</text>
+                        </svg>
+                    </div>
+                    <div class="score-message">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="answers-container">
+                    <h3>Question Summary</h3>
+                    <div class="answers-tabs">
+                        <button class="tab-btn active" data-tab="all">All Questions</button>
+                        <button class="tab-btn" data-tab="correct">Correct Answers</button>
+                        <button class="tab-btn" data-tab="incorrect">Incorrect Answers</button>
+                    </div>
+                    <div class="answers-list">
+                        <ul id="answers-list">
+                            <!-- Filled by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button id="retry-btn" class="btn btn-secondary">Try Again</button>
+                    <button id="home-btn" class="btn btn-primary">Back to Home</button>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Master Blender shortcuts to level up your skills!</p>
+        </footer>
+    </div>
+    
+    <script src="js/effects.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/results.js"></script>
+</body>
+</html>
