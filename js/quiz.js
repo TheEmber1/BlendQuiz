@@ -247,7 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
             state.score++;
             state.results.correct.push({
                 question: question.question,
-                answer: question.correctAnswer
+                answer: question.correctAnswer,
+                isBonus: question.isBonus
             });
             
             // Ensure confetti is triggered for correct answer
@@ -256,32 +257,53 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.triggerConfetti();
                 }
             }, 100);
+            
+            // Play success sound if available
+            playSound('correct');
         } else {
             state.results.incorrect.push({
                 question: question.question,
                 userAnswer: selectedAnswer,
-                correctAnswer: question.correctAnswer
+                correctAnswer: question.correctAnswer,
+                isBonus: question.isBonus
             });
+            
+            // Play error sound if available
+            playSound('incorrect');
         }
         
         // Highlight correct/incorrect answers
         const answerButtons = document.querySelectorAll('.answer-btn');
         answerButtons.forEach(button => {
-            if (button.textContent === question.correctAnswer) {
-                button.classList.add('correct');
-            } else if (button.textContent === selectedAnswer && !isCorrect) {
-                button.classList.add('incorrect');
-            }
-            
             // Disable the button to prevent multiple answers
             button.disabled = true;
+            
+            if (button.textContent === question.correctAnswer) {
+                // Always show the correct answer
+                setTimeout(() => {
+                    button.classList.add('correct');
+                }, isCorrect ? 0 : 400); // Delay showing correct answer if the user was wrong
+            } else if (button.textContent === selectedAnswer && !isCorrect) {
+                // Mark the selected wrong answer
+                button.classList.add('incorrect');
+            } else {
+                // Fade out other options
+                button.style.opacity = '0.5';
+            }
         });
         
         // Move to next question after a delay
         setTimeout(() => {
             state.currentQuestion++;
             displayQuestion();
-        }, 1500);
+        }, 1800); // Increased delay to allow animations to complete
+    }
+    
+    // Small helper function to play sounds if we add them later
+    function playSound(type) {
+        // This is a placeholder for potential sound effect implementation
+        // Could be connected to audio elements or Web Audio API
+        // console.log(`Playing ${type} sound`);
     }
     
     // Override the checkAnswer function to track time per question

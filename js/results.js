@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isAssessment) {
             statsHTML = `
                 <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-check-circle"></i>
+                    <div class="stat-icon" style="color: var(--main-color)">
+                        <i class='bx bxs-check-circle'></i>
                     </div>
                     <div class="stat-content">
                         <span class="stat-title">Correct Answers</span>
@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-clock"></i>
+                    <div class="stat-icon" style="color: var(--main-color)">
+                        <i class='bx bxs-time-five'></i>
                     </div>
                     <div class="stat-content">
                         <span class="stat-title">Completion Time</span>
@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-star"></i>
+                    <div class="stat-icon" style="color: var(--main-color)">
+                        <i class='bx bxs-star'></i>
                     </div>
                     <div class="stat-content">
                         <span class="stat-title">Total Score</span>
@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         } else {
-            // Modify the stats HTML for regular quizzes to also show score
+            // For regular quiz, also use the new horizontal layout with Boxicons
             statsHTML = `
                 <div class="stat-card" style="border-left-color: ${difficultyColor}">
-                    <div class="stat-icon" style="background-color: rgba(${hexToRgb(difficultyColor)}, 0.2); color: ${difficultyColor}">
+                    <div class="stat-icon" style="color: ${difficultyColor}">
                         <i class="${difficultyIcon}"></i>
                     </div>
                     <div class="stat-content">
@@ -105,31 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-check-circle"></i>
+                    <div class="stat-icon" style="color: var(--main-color)">
+                        <i class='bx bxs-check-circle'></i>
                     </div>
                     <div class="stat-content">
-                        <span class="stat-title">Correct Answers</span>
+                        <span class="stat-title">Correct</span>
                         <span class="stat-value">${results.correct.length}/${totalQuestions}</span>
                     </div>
                 </div>
                 
                 <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-clock"></i>
+                    <div class="stat-icon" style="color: var(--main-color)">
+                        <i class='bx bxs-star'></i>
                     </div>
                     <div class="stat-content">
-                        <span class="stat-title">Completion Time</span>
-                        <span class="stat-value">${results.completionTime}</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-title">Total Score</span>
+                        <span class="stat-title">Score</span>
                         <span class="stat-value">${results.scorePoints}/100</span>
                     </div>
                 </div>
