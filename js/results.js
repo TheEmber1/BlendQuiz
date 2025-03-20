@@ -143,8 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupSkillLevel(skillLevel) {
         const skillContainer = document.getElementById('skill-level-container');
         
+        // Remove the heading and just display the skill badge
         skillContainer.innerHTML = `
-            <h3>Your Blender Skill Level</h3>
             <div class="skill-badge ${skillLevel.className}">
                 <div class="skill-icon">
                     <i class="${skillLevel.icon}"></i>

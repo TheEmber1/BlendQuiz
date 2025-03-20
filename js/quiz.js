@@ -205,6 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update question number
         document.getElementById('current-question').textContent = state.currentQuestion + 1;
         
+        // Update progress bar
+        updateProgressBar();
+        
         // Check if this is a bonus pro question and add a visual indicator
         if (question.isBonus) {
             document.getElementById('question').innerHTML = 
@@ -235,6 +238,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.style.display = 'none';
             }
         });
+    }
+    
+    // Add function to update progress bar
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercentage = (state.currentQuestion / state.questions.length) * 100;
+        
+        // Animate the progress bar
+        progressBar.style.width = `${progressPercentage}%`;
+        
+        // Change the color slightly for visual feedback
+        const hue = 260 + (progressPercentage / 100) * 10;
+        progressBar.style.backgroundColor = `hsl(${hue}, 70%, 70%)`;
     }
     
     // Function to check if the answer is correct
@@ -287,8 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Mark the selected wrong answer
                 button.classList.add('incorrect');
             } else {
-                // Fade out other options
-                button.style.opacity = '0.5';
+                // Change the styling of unselected options but keep text fully visible
+                button.classList.add('unselected');
             }
         });
         
