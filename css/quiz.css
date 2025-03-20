@@ -23,6 +23,9 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
 #confetti-canvas {
@@ -36,12 +39,27 @@ body {
 }
 
 .container {
-    width: 90%;
-    max-width: 800px;
+    width: 100%;
+    max-width: 1200px;
+    min-height: 100vh;
     padding: 2rem;
     background-color: var(--container-bg);
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#quiz-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 header {
@@ -66,7 +84,12 @@ header h1 {
 }
 
 #question-container {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 2rem 0;
 }
 
 #question {
@@ -75,6 +98,9 @@ header h1 {
 }
 
 .answers {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
@@ -235,7 +261,99 @@ header h1 {
     display: none;
 }
 
+/* Skill level display */
+.skill-level {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.skill-level h3 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    color: var(--secondary-color);
+}
+
+.skill-badge {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid var(--main-color);
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.skill-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-size: 1.8rem;
+    background-color: rgba(123, 108, 246, 0.2);
+    color: var(--main-color);
+}
+
+.skill-content {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.skill-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.skill-desc {
+    font-size: 1rem;
+    color: #bbb;
+}
+
+/* Skill level variants */
+.skill-novice { border-left-color: #f44336; }
+.skill-novice .skill-icon { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
+
+.skill-beginner { border-left-color: #ff9800; }
+.skill-beginner .skill-icon { background-color: rgba(255, 152, 0, 0.2); color: #ff9800; }
+
+.skill-casual { border-left-color: #ffc107; }
+.skill-casual .skill-icon { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; }
+
+.skill-comfortable { border-left-color: #8bc34a; }
+.skill-comfortable .skill-icon { background-color: rgba(139, 195, 74, 0.2); color: #8bc34a; }
+
+.skill-proficient { border-left-color: #4caf50; }
+.skill-proficient .skill-icon { background-color: rgba(76, 175, 80, 0.2); color: #4caf50; }
+
+.skill-advanced { border-left-color: #2196f3; }
+.skill-advanced .skill-icon { background-color: rgba(33, 150, 243, 0.2); color: #2196f3; }
+
+.skill-expert { border-left-color: #3f51b5; }
+.skill-expert .skill-icon { background-color: rgba(63, 81, 181, 0.2); color: #3f51b5; }
+
+.skill-master { border-left-color: #9c27b0; }
+.skill-master .skill-icon { background-color: rgba(156, 39, 176, 0.2); color: #9c27b0; }
+
+.skill-wizard { border-left-color: #e91e63; }
+.skill-wizard .skill-icon { background-color: rgba(233, 30, 99, 0.2); color: #e91e63; }
+
+.skill-prodigy { border-left-color: #e91e63; }
+.skill-prodigy .skill-icon { background-color: rgba(233, 30, 99, 0.2); color: #e91e63; }
+
 @media (max-width: 700px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    #question {
+        font-size: 1.5rem;
+    }
+    
     .answers {
         grid-template-columns: 1fr;
     }

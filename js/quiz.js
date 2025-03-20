@@ -1,35 +1,89 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Get the selected difficulty from sessionStorage
-    const difficulty = sessionStorage.getItem('quizDifficulty') || 'noob';
+    // Check if we're in assessment mode
+    const isAssessment = sessionStorage.getItem('isAssessment') === 'true';
     
-    // Display the difficulty on the page
-    document.getElementById('difficulty').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    // Get the selected difficulty from sessionStorage (for regular quiz mode)
+    const difficulty = isAssessment ? 'assessment' : (sessionStorage.getItem('quizDifficulty') || 'noob');
+    
+    // Display the appropriate title
+    if (isAssessment) {
+        document.getElementById('difficulty').textContent = 'Skill Assessment';
+        document.querySelector('.quiz-info').innerHTML = `
+            <span id="progress-label">Question <span id="current-question">1</span>/12</span>
+            <span id="timer">Time: <span id="time-counter">0:00</span></span>
+        `;
+    } else {
+        document.getElementById('difficulty').textContent = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+    }
     
     // Quiz state
     const state = {
         currentQuestion: 0,
         score: 0,
-        totalQuestions: 5,
+        totalQuestions: isAssessment ? 12 : 5,
         questions: [],
         results: {
             correct: [],
             incorrect: []
         },
-        startTime: new Date(), // Track when the quiz started
-        endTime: null // Will store when the quiz ends
+        startTime: new Date(),
+        endTime: null,
+        questionTimes: [] // Track time for each question
     };
     
-    // Get shortcuts for the selected difficulty
-    const shortcuts = shortcutsByDifficulty[difficulty];
+    // Set up timer
+    let elapsedSeconds = 0;
+    const timer = setInterval(() => {
+        elapsedSeconds++;
+        if (document.getElementById('time-counter')) {
+            document.getElementById('time-counter').textContent = formatTime(elapsedSeconds);
+        }
+    }, 1000);
     
-    // Generate questions for the quiz
-    generateQuestions();
+    // Generate questions based on mode
+    if (isAssessment) {
+        generateAssessmentQuestions();
+    } else {
+        // Regular mode - get shortcuts for the selected difficulty
+        const shortcuts = shortcutsByDifficulty[difficulty];
+        generateQuestions(shortcuts);
+    }
     
     // Display the first question
     displayQuestion();
     
-    // Function to generate a set of questions
-    function generateQuestions() {
+    // Function to generate a set of assessment questions (3 from each difficulty)
+    function generateAssessmentQuestions() {
+        const difficultyLevels = ['noob', 'easy', 'intermediate', 'pro'];
+        let allQuestions = [];
+        
+        // Get 3 questions from each difficulty level
+        difficultyLevels.forEach(level => {
+            const levelShortcuts = [...shortcutsByDifficulty[level]];
+            const shuffledShortcuts = levelShortcuts.sort(() => Math.random() - 0.5);
+            
+            // Take 3 shortcuts from this level
+            const selectedShortcuts = shuffledShortcuts.slice(0, 3);
+            
+            // Create questions for each shortcut
+            selectedShortcuts.forEach(shortcut => {
+                const incorrectOptions = generateIncorrectOptions(shortcut);
+                
+                allQuestions.push({
+                    question: `What is the shortcut for "${shortcut.action}"?`,
+                    correctAnswer: shortcut.key,
+                    options: shuffleArray([...incorrectOptions, shortcut.key]),
+                    difficulty: level
+                });
+            });
+        });
+        
+        // Shuffle all questions to mix difficulty levels
+        state.questions = shuffleArray(allQuestions);
+    }
+    
+    // Function to generate regular quiz questions
+    function generateQuestions(shortcuts) {
         // Shuffle shortcuts to get random set
         const shuffledShortcuts = [...shortcuts].sort(() => Math.random() - 0.5);
         
@@ -46,7 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
             state.questions.push({
                 question: `What is the shortcut for "${correctShortcut.action}"?`,
                 correctAnswer: correctShortcut.key,
-                options: shuffleArray([...incorrectOptions, correctShortcut.key])
+                options: shuffleArray([...incorrectOptions, correctShortcut.key]),
+                difficulty: difficulty
             });
         }
     }
@@ -153,52 +208,92 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
+    // Override the checkAnswer function to track time per question
+    const originalCheckAnswer = checkAnswer;
+    checkAnswer = function(selectedAnswer) {
+        // Record time taken for this question
+        const questionEndTime = new Date();
+        const questionTime = (questionEndTime - state.startTime) / 1000 - 
+            state.questionTimes.reduce((total, time) => total + time, 0);
+        state.questionTimes.push(questionTime);
+        
+        // Call the original function
+        originalCheckAnswer(selectedAnswer);
+    };
+    
     // Function to show the final results
     function showResults() {
+        // Stop the timer
+        clearInterval(timer);
+        
         // Record end time
         state.endTime = new Date();
-        const timeTaken = Math.round((state.endTime - state.startTime) / 1000); // in seconds
+        const timeTaken = Math.round((state.endTime - state.startTime) / 1000);
         
-        // Hide question container
+        // Hide question container and show results
         document.getElementById('question-container').classList.add('hidden');
-        
-        // Show results container
         const resultsContainer = document.getElementById('results-container');
         resultsContainer.classList.remove('hidden');
         
         // Update score
         document.getElementById('correct-count').textContent = state.score;
         
-        // Add difficulty info with appropriate icon
-        const difficultyIcon = getDifficultyIcon(difficulty);
-        const difficultyColor = getDifficultyColor(difficulty);
-        
-        const difficultyElement = document.createElement('div');
-        difficultyElement.className = 'quiz-stats';
-        difficultyElement.innerHTML = `
-            <div class="stat-card" style="border-left-color: ${difficultyColor}">
-                <div class="stat-icon" style="background-color: rgba(${hexToRgb(difficultyColor)}, 0.2); color: ${difficultyColor}">
-                    <i class="${difficultyIcon}"></i>
-                </div>
-                <div class="stat-content">
-                    <span class="stat-title">Difficulty</span>
-                    <span class="stat-value">${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
-                </div>
-            </div>
+        if (isAssessment) {
+            // Calculate skill level based on score and time
+            const skillLevel = calculateSkillLevel(state.score, timeTaken);
             
-            <div class="stat-card" style="border-left-color: var(--main-color)">
-                <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
-                    <i class="fas fa-clock"></i>
+            // Create the skill level element
+            const skillLevelElement = document.createElement('div');
+            skillLevelElement.className = 'skill-level';
+            skillLevelElement.innerHTML = `
+                <h3>Your Blender Skill Level:</h3>
+                <div class="skill-badge ${skillLevel.className}">
+                    <div class="skill-icon">
+                        <i class="${skillLevel.icon}"></i>
+                    </div>
+                    <div class="skill-content">
+                        <span class="skill-title">${skillLevel.title}</span>
+                        <span class="skill-desc">${skillLevel.description}</span>
+                    </div>
                 </div>
-                <div class="stat-content">
-                    <span class="stat-title">Completion Time</span>
-                    <span class="stat-value">${formatTime(timeTaken)}</span>
-                </div>
-            </div>
-        `;
+            `;
+            
+            // Insert at the top of results
+            document.querySelector('.results').prepend(skillLevelElement);
+        }
         
-        // Insert at the top of results
-        document.querySelector('.results').prepend(difficultyElement);
+        // Add difficulty info with appropriate icon for regular quiz
+        if (!isAssessment) {
+            const difficultyIcon = getDifficultyIcon(difficulty);
+            const difficultyColor = getDifficultyColor(difficulty);
+            
+            const difficultyElement = document.createElement('div');
+            difficultyElement.className = 'quiz-stats';
+            difficultyElement.innerHTML = `
+                <div class="stat-card" style="border-left-color: ${difficultyColor}">
+                    <div class="stat-icon" style="background-color: rgba(${hexToRgb(difficultyColor)}, 0.2); color: ${difficultyColor}">
+                        <i class="${difficultyIcon}"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-title">Difficulty</span>
+                        <span class="stat-value">${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" style="border-left-color: var(--main-color)">
+                    <div class="stat-icon" style="background-color: rgba(123, 108, 246, 0.2); color: var(--main-color)">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-title">Completion Time</span>
+                        <span class="stat-value">${formatTime(timeTaken)}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Insert at the top of results
+            document.querySelector('.results').prepend(difficultyElement);
+        }
         
         // Simplify results display
         const resultsList = document.getElementById('result-answers');
@@ -249,6 +344,101 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('home-btn').addEventListener('click', () => {
             window.location.href = 'index.html';
         });
+    }
+    
+    // Function to calculate skill level based on score and time
+    function calculateSkillLevel(score, timeTaken) {
+        // Base skill points on correct answers (0-12 points)
+        let skillPoints = score;
+        
+        // Add time bonus (up to 3 points)
+        // For perfect time (less than 60 seconds), award 3 points
+        // For good time (less than 120 seconds), award 2 points
+        // For decent time (less than 180 seconds), award 1 point
+        if (timeTaken < 60) {
+            skillPoints += 3;
+        } else if (timeTaken < 120) {
+            skillPoints += 2;
+        } else if (timeTaken < 180) {
+            skillPoints += 1;
+        }
+        
+        // Define skill levels (from 15 possible points)
+        const skillLevels = [
+            {
+                threshold: 0,
+                title: "Blender Novice",
+                description: "You're just beginning your Blender journey.",
+                icon: "fas fa-baby",
+                className: "skill-novice"
+            },
+            {
+                threshold: 2,
+                title: "Blender Beginner",
+                description: "You know a few basics, but have a lot to learn.",
+                icon: "fas fa-walking",
+                className: "skill-beginner"
+            },
+            {
+                threshold: 4,
+                title: "Casual User",
+                description: "You can find your way around, slowly but surely.",
+                icon: "fas fa-child",
+                className: "skill-casual"
+            },
+            {
+                threshold: 6,
+                title: "Comfortable User",
+                description: "You're getting comfortable with Blender's interface.",
+                icon: "fas fa-thumbs-up",
+                className: "skill-comfortable"
+            },
+            {
+                threshold: 8,
+                title: "Proficient User",
+                description: "You're working efficiently with Blender's tools.",
+                icon: "fas fa-user",
+                className: "skill-proficient"
+            },
+            {
+                threshold: 10,
+                title: "Advanced User",
+                description: "You know Blender well and work efficiently.",
+                icon: "fas fa-user-tie",
+                className: "skill-advanced"
+            },
+            {
+                threshold: 12,
+                title: "Blender Expert",
+                description: "You've mastered most of Blender's shortcuts.",
+                icon: "fas fa-user-graduate",
+                className: "skill-expert"
+            },
+            {
+                threshold: 14,
+                title: "Blender Master",
+                description: "You're lightning fast and incredibly knowledgeable!",
+                icon: "fas fa-crown",
+                className: "skill-master"
+            },
+            {
+                threshold: 15,
+                title: "Blender Prodigy",
+                description: "Wow! You're on Blender developer level!",
+                icon: "fas fa-medal",
+                className: "skill-prodigy"
+            }
+        ];
+        
+        // Find appropriate skill level based on points
+        for (let i = skillLevels.length - 1; i >= 0; i--) {
+            if (skillPoints >= skillLevels[i].threshold) {
+                return skillLevels[i];
+            }
+        }
+        
+        // Default if something goes wrong
+        return skillLevels[0];
     }
     
     // Format seconds into minutes:seconds

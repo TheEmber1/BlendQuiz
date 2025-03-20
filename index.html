@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlendQuiz</title>
+    <title>BlendQuiz - Blender Skill Assessment</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -17,46 +17,62 @@
                 </div>
                 <h1>BlendQuiz</h1>
             </div>
-            <p class="tagline">Master Blender shortcuts & level up your skills!</p>
+            <p class="tagline">Discover your Blender skill level!</p>
         </header>
         
         <main>
-            <div class="difficulty-selection">
-                <h2>Select Your Challenge Level</h2>
-                <div class="difficulty-info">Choose a difficulty that matches your Blender experience</div>
+            <div class="skill-assessment">
+                <h2>Blender Skill Assessment</h2>
+                <div class="assessment-info">
+                    <p>Test your Blender knowledge across all skill levels</p>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> 12 questions from Noob to Pro level</li>
+                        <li><i class="fas fa-check-circle"></i> Measures both your knowledge and speed</li>
+                        <li><i class="fas fa-check-circle"></i> Reveals your true Blender skill level</li>
+                    </ul>
+                </div>
                 
-                <div class="buttons-grid">
-                    <button class="btn btn-noob" onclick="startQuiz('noob')">
-                        <div class="btn-icon"><i class="fas fa-baby"></i></div>
-                        <div class="btn-content">
-                            <span class="btn-title">Noob</span>
-                            <span class="btn-desc">Just starting with Blender</span>
-                        </div>
+                <div class="start-assessment">
+                    <button class="assessment-btn" onclick="startAssessment()">
+                        <i class="fas fa-play-circle"></i> Start Skill Assessment
                     </button>
-                    
-                    <button class="btn btn-easy" onclick="startQuiz('easy')">
-                        <div class="btn-icon"><i class="fas fa-user"></i></div>
-                        <div class="btn-content">
-                            <span class="btn-title">Easy</span>
-                            <span class="btn-desc">Familiar with basics</span>
-                        </div>
-                    </button>
-                    
-                    <button class="btn btn-intermediate" onclick="startQuiz('intermediate')">
-                        <div class="btn-icon"><i class="fas fa-user-graduate"></i></div>
-                        <div class="btn-content">
-                            <span class="btn-title">Intermediate</span>
-                            <span class="btn-desc">Comfortable with Blender</span>
-                        </div>
-                    </button>
-                    
-                    <button class="btn btn-pro" onclick="startQuiz('pro')">
-                        <div class="btn-icon"><i class="fas fa-crown"></i></div>
-                        <div class="btn-content">
-                            <span class="btn-title">Pro</span>
-                            <span class="btn-desc">Advanced Blender ninja</span>
-                        </div>
-                    </button>
+                </div>
+                
+                <div class="option-buttons">
+                    <h3>Or practice specific levels</h3>
+                    <div class="buttons-grid">
+                        <button class="btn btn-noob" onclick="startQuiz('noob')">
+                            <div class="btn-icon"><i class="fas fa-baby"></i></div>
+                            <div class="btn-content">
+                                <span class="btn-title">Noob</span>
+                                <span class="btn-desc">Just starting with Blender</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-easy" onclick="startQuiz('easy')">
+                            <div class="btn-icon"><i class="fas fa-user"></i></div>
+                            <div class="btn-content">
+                                <span class="btn-title">Easy</span>
+                                <span class="btn-desc">Familiar with basics</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-intermediate" onclick="startQuiz('intermediate')">
+                            <div class="btn-icon"><i class="fas fa-user-graduate"></i></div>
+                            <div class="btn-content">
+                                <span class="btn-title">Intermediate</span>
+                                <span class="btn-desc">Comfortable with Blender</span>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-pro" onclick="startQuiz('pro')">
+                            <div class="btn-icon"><i class="fas fa-crown"></i></div>
+                            <div class="btn-content">
+                                <span class="btn-title">Pro</span>
+                                <span class="btn-desc">Advanced Blender ninja</span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
