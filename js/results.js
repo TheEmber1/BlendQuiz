@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const difficultyIcon = getDifficultyIcon(difficulty);
         const difficultyColor = getDifficultyColor(difficulty);
         
-        // Create cards based on whether it's an assessment or regular quiz
+        // Create only two cards, aligned with the skill level box above
         let statsHTML = '';
         
         if (isAssessment) {
             statsHTML = `
-                <div class="stat-card" style="border-left-color: var(--main-color)">
+                <div class="stat-card left-card" style="border-left-color: var(--main-color)">
                     <div class="stat-icon" style="color: var(--main-color)">
                         <i class='bx bxs-check-circle'></i>
                     </div>
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 
-                <div class="stat-card" style="border-left-color: var(--main-color)">
+                <div class="stat-card right-card" style="border-left-color: var(--main-color)">
                     <div class="stat-icon" style="color: var(--main-color)">
                         <i class='bx bxs-time-five'></i>
                     </div>
@@ -80,21 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="stat-value">${results.completionTime}</span>
                     </div>
                 </div>
-                
-                <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="color: var(--main-color)">
-                        <i class='bx bxs-star'></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-title">Total Score</span>
-                        <span class="stat-value">${results.scorePoints}/100</span>
-                    </div>
-                </div>
             `;
         } else {
-            // For regular quiz, also use the new horizontal layout with Boxicons
             statsHTML = `
-                <div class="stat-card" style="border-left-color: ${difficultyColor}">
+                <div class="stat-card left-card" style="border-left-color: ${difficultyColor}">
                     <div class="stat-icon" style="color: ${difficultyColor}">
                         <i class="${difficultyIcon}"></i>
                     </div>
@@ -104,23 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 
-                <div class="stat-card" style="border-left-color: var(--main-color)">
+                <div class="stat-card right-card" style="border-left-color: var(--main-color)">
                     <div class="stat-icon" style="color: var(--main-color)">
                         <i class='bx bxs-check-circle'></i>
                     </div>
                     <div class="stat-content">
-                        <span class="stat-title">Correct</span>
+                        <span class="stat-title">Correct Answers</span>
                         <span class="stat-value">${results.correct.length}/${totalQuestions}</span>
-                    </div>
-                </div>
-                
-                <div class="stat-card" style="border-left-color: var(--main-color)">
-                    <div class="stat-icon" style="color: var(--main-color)">
-                        <i class='bx bxs-star'></i>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-title">Score</span>
-                        <span class="stat-value">${results.scorePoints}/100</span>
                     </div>
                 </div>
             `;
@@ -130,11 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function setupScoreDonut(results) {
-        // Instead of percentage based on correct answers, use the overall score
+        // Use the score percentage for the donut
         const scorePercentage = results.scorePoints;
         
-        // Set the score text
-        document.querySelector('.score-text').textContent = `${scorePercentage}`;
+        // Set the score text to show percentage
+        document.querySelector('.score-text').textContent = `${scorePercentage}%`;
+        
+        // Remove the "/100" scale text as it's now shown as a percentage
+        const scaleText = document.querySelector('.score-scale');
+        if (scaleText) scaleText.remove();
         
         // Set the donut progress
         const scoreValue = document.querySelector('.score-value');

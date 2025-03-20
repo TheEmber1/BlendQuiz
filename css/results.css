@@ -146,7 +146,7 @@ main {
     color: #bbb;
 }
 
-/* Stats styling - horizontal layout with new icons */
+/* Stats styling - align with skill level box */
 .stats-container {
     margin-bottom: 2rem;
     width: 100%;
@@ -155,18 +155,14 @@ main {
 }
 
 .stat-cards {
-    display: flex;
-    flex-direction: row; /* Change to row for horizontal layout */
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     width: 100%;
-    max-width: 800px; /* Wider to accommodate horizontal layout */
+    max-width: 500px; /* Match the skill-badge max-width */
 }
 
 .stat-card {
-    flex: 1;
-    min-width: 150px;
-    max-width: 240px;
     display: flex;
     align-items: center;
     padding: 1.25rem;
@@ -178,6 +174,13 @@ main {
 
 .stat-card:hover {
     transform: translateY(-3px);
+}
+
+/* Remove max-width from individual cards to take full width in the grid */
+.stat-card {
+    min-width: 0;
+    max-width: none;
+    flex: 1;
 }
 
 .stat-icon {
@@ -231,13 +234,15 @@ main {
 }
 
 .score-circle {
-    transform: rotate(-90deg);
+    position: relative;
 }
 
 .score-ring {
     fill: none;
     stroke: rgba(255, 255, 255, 0.1);
     stroke-width: 10;
+    transform: rotate(-90deg);
+    transform-origin: center;
 }
 
 .score-value {
@@ -247,19 +252,21 @@ main {
     stroke-dasharray: 502;
     stroke-dashoffset: 502;
     transition: stroke-dashoffset 1s ease-in-out;
+    transform: rotate(-90deg);
+    transform-origin: center;
 }
 
 .score-text {
     fill: white;
     font-size: 2.5rem;
     font-weight: bold;
-    transform: rotate(90deg);
 }
 
 .score-label {
     fill: #aaa;
     font-size: 0.9rem;
-    transform: rotate(90deg);
+    dominant-baseline: hanging;
+    y: 18px; /* Adjust position to accommodate percentage symbol */
 }
 
 .score-scale {
@@ -486,8 +493,8 @@ footer {
     }
     
     .stat-cards {
-        flex-direction: column;
-        max-width: 500px;
+        grid-template-columns: 1fr; /* Stack on mobile */
+        max-width: 100%;
     }
     
     .stat-card {
@@ -501,11 +508,7 @@ footer {
 
 @media (min-width: 769px) {
     .stat-cards {
-        flex-direction: row; /* Ensure horizontal layout on larger screens */
-    }
-    
-    .stat-card {
-        flex: 1;
+        grid-template-columns: 1fr 1fr; /* Two columns on larger screens */
     }
 }
 
