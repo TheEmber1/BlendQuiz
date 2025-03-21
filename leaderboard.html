@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlendQuiz - Leaderboard</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-main">
+                <h1><i class='bx bxl-blender'></i> BlendQuiz</h1>
+                <nav>
+                    <a href="index.html">Home</a>
+                    <a href="leaderboard.html" class="active">Leaderboard</a>
+                    <div class="nickname-container hidden">
+                        <span class="nickname-display"></span>
+                        <button class="clear-nickname-btn">Clear</button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="leaderboard-container">
+                <div class="leaderboard-header">
+                    <h2>Global Leaderboard</h2>
+                    <p>Top scores from BlendQuiz skill assessments</p>
+                </div>
+                
+                <!-- Nickname form for new users -->
+                <div class="nickname-form">
+                    <p>Enter a nickname to track your scores on the leaderboard:</p>
+                    <div class="nickname-input-container">
+                        <input type="text" id="nickname-input" placeholder="Your nickname">
+                        <button id="set-nickname-btn" class="btn btn-primary">Set Nickname</button>
+                    </div>
+                </div>
+                
+                <!-- User profile section (shows when nickname is set) -->
+                <div class="profile-card nickname-required" style="display: none;">
+                    <div class="profile-header">
+                        <h3>Your Profile</h3>
+                    </div>
+                    <div class="profile-content">
+                        <!-- Filled by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Leaderboard table (always visible) -->
+                <div class="leaderboard-table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Nickname</th>
+                                <th>Score</th>
+                                <th>Correct</th>
+                                <th>Time</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Master all shortcuts to become a Blender expert!</p>
+            <div class="creator-info">
+                <p>Created by <a href="https://youtube.com/@The_Ember" target="_blank" rel="noopener">THE EMBER <i class="fab fa-youtube"></i></a></p>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="js/simple-leaderboard.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set nickname button
+            document.getElementById('set-nickname-btn')?.addEventListener('click', () => {
+                const nicknameInput = document.getElementById('nickname-input');
+                const nickname = nicknameInput.value.trim();
+                
+                if (nickname) {
+                    const result = window.simpleLeaderboard.setNickname(nickname);
+                    if (result.success) {
+                        loadUserProfile();
+                    } else {
+                        alert(result.message);
+                    }
+                } else {
+                    alert('Please enter a valid nickname');
+                }
+            });
+            
+            // Clear nickname button
+            document.querySelector('.clear-nickname-btn')?.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear your nickname?')) {
+                    window.simpleLeaderboard.clearNickname();
+                    loadLeaderboard(); // Refresh the leaderboard
+                }
+            });
+            
+            // Load leaderboard (always)
+            loadLeaderboard();
+            
+            // Load user profile if nickname is set
+            if (window.simpleLeaderboard.hasNickname()) {
+                loadUserProfile();
+            }
+            
+            function loadUserProfile() {
+                const profileContent = document.querySelector('.profile-content');
+                const bestScore = window.simpleLeaderboard.getUserBestScore();
+                
+                if (!profileContent) return;
+                
+                if (!bestScore) {
+                    profileContent.innerHTML = `
+                        <div class="profile-info">
+                            <p><strong>Nickname:</strong> ${window.simpleLeaderboard.getNickname()}</p>
+                        </div>
+                        <div class="profile-message">
+                            <p>You haven't taken the skill assessment yet!</p>
+                            <a href="index.html" class="btn btn-primary">Take Assessment</a>
+                        </div>
+                    `;
+                } else {
+                    // Find user's rank
+                    const leaderboard = window.simpleLeaderboard.getLeaderboard(100);
+                    const userRank = leaderboard.findIndex(entry => 
+                        entry.nickname === window.simpleLeaderboard.getNickname()) + 1;
+                    
+                    profileContent.innerHTML = `
+                        <div class="profile-info">
+                            <p><strong>Nickname:</strong> ${window.simpleLeaderboard.getNickname()}</p>
+                            <p><strong>Global Rank:</strong> ${userRank > 0 ? `#${userRank}` : 'Not ranked'}</p>
+                            <p><strong>Best Score:</strong> ${bestScore.scorePoints}%</p>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat">
+                                <span class="stat-value">${bestScore.correct.length}/${bestScore.totalQuestions}</span>
+                                <span class="stat-label">Correct</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${bestScore.completionTime}</span>
+                                <span class="stat-label">Time</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${window.simpleLeaderboard.getUserScores().length}</span>
+                                <span class="stat-label">Attempts</span>
+                            </div>
+                        </div>
+                        <div class="profile-actions">
+                            <a href="index.html" class="btn btn-primary">Improve Score</a>
+                        </div>
+                    `;
+                }
+            }
+            
+            function loadLeaderboard() {
+                const leaderboard = window.simpleLeaderboard.getLeaderboard(20);
+                const tableBody = document.getElementById('leaderboard-body');
+                
+                if (!tableBody) return;
+                
+                if (leaderboard.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                No scores yet! Be the first to take the assessment.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tableBody.innerHTML = '';
+                
+                leaderboard.forEach((entry, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Highlight current user
+                    if (window.simpleLeaderboard.hasNickname() && 
+                        entry.nickname === window.simpleLeaderboard.getNickname()) {
+                        row.classList.add('current-user');
+                    }
+                    
+                    // Highlight top 3
+                    if (index < 3) {
+                        row.classList.add(`rank-${index+1}`);
+                    }
+                    
+                    row.innerHTML = `
+                        <td>
+                            ${index < 3 ? 
+                                `<i class="fas fa-trophy rank-${index+1}-icon"></i>` : 
+                                `#${index+1}`}
+                        </td>
+                        <td>${entry.nickname}</td>
+                        <td>${entry.scorePoints}%</td>
+                        <td>${entry.correct.length}/${entry.totalQuestions}</td>
+                        <td>${entry.completionTime}</td>
+                        <td>${formatDate(entry.timestamp)}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlendQuiz - Login/Sign Up</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class='bx bxl-blender'></i> BlendQuiz</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Login</button>
+                    <button class="tab-btn" data-tab="signup">Sign Up</button>
+                </div>
+                
+                <div class="auth-form-container">
+                    <!-- Login Form -->
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <div class="form-message" id="login-message"></div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                    
+                    <!-- Sign Up Form -->
+                    <form id="signup-form" class="auth-form hidden">
+                        <div class="form-group">
+                            <label for="signup-username">Username</label>
+                            <input type="text" id="signup-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-confirm">Confirm Password</label>
+                            <input type="password" id="signup-confirm" required>
+                        </div>
+                        <div class="form-message" id="signup-message"></div>
+                        <button type="submit" class="btn btn-primary">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Master all shortcuts to become a Blender expert!</p>
+            <div class="creator-info">
+                <p>Created by <a href="https://youtube.com/@The_Ember" target="_blank" rel="noopener">THE EMBER <i class="fab fa-youtube"></i></a></p>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab switching logic
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const forms = document.querySelectorAll('.auth-form');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.dataset.tab;
+                    
+                    // Update active tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show the selected form
+                    forms.forEach(form => {
+                        if (form.id === `${tabName}-form`) {
+                            form.classList.remove('hidden');
+                        } else {
+                            form.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+            
+            // Login form submission
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                
+                const result = window.auth.login(username, password);
+                const messageEl = document.getElementById('login-message');
+                
+                if (result.success) {
+                    messageEl.innerHTML = `<span class="success">${result.message}</span>`;
+                    // Redirect to home after successful login
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    messageEl.innerHTML = `<span class="error">${result.message}</span>`;
+                }
+            });
+            
+            // Signup form submission
+            document.getElementById('signup-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('signup-username').value;
+                const password = document.getElementById('signup-password').value;
+                const confirm = document.getElementById('signup-confirm').value;
+                const messageEl = document.getElementById('signup-message');
+                
+                // Simple validation
+                if (password !== confirm) {
+                    messageEl.innerHTML = '<span class="error">Passwords do not match!</span>';
+                    return;
+                }
+                
+                const result = window.auth.register(username, password);
+                
+                if (result.success) {
+                    messageEl.innerHTML = `<span class="success">${result.message}</span>`;
+                    // Switch to login tab
+                    document.querySelector('.tab-btn[data-tab="login"]').click();
+                    // Clear the form
+                    document.getElementById('signup-form').reset();
+                } else {
+                    messageEl.innerHTML = `<span class="error">${result.message}</span>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

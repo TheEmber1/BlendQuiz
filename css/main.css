@@ -458,3 +458,50 @@ copyright {
 .option-buttons h3::after {
     display: none;
 }
+
+/* Nickname styles */
+.nickname-container {
+    display: flex;
+    align-items: center;
+    background-color: rgba(123, 108, 246, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    margin-left: 1rem;
+}
+
+.nickname-display {
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.nav-links a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+    margin: 0 0.5rem;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--main-color);
+    text-decoration: underline;
+}
+
+.leaderboard-link {
+    display: inline-block;
+    background-color: rgba(123, 108, 246, 0.1);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.leaderboard-link:hover {
+    background-color: rgba(123, 108, 246, 0.2);
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlendQuiz - Verify Email</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class='bx bxl-blender'></i> BlendQuiz</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="leaderboard.html">Leaderboard</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="verify-container">
+                <h2>Email Verification</h2>
+                
+                <div id="auto-verify-message">
+                    <p>Verifying your email...</p>
+                </div>
+                
+                <div id="manual-verify" class="hidden">
+                    <p>If automatic verification fails, please enter your verification token below:</p>
+                    <form id="verify-form">
+                        <div class="form-group">
+                            <input type="text" id="verify-token" placeholder="Verification Token" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verify Email</button>
+                    </form>
+                </div>
+                
+                <div id="verify-result" class="form-message"></div>
+                
+                <div class="action-links">
+                    <a href="login.html">Return to Login</a>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Master all shortcuts to become a Blender expert!</p>
+            <div class="creator-info">
+                <p>Created by <a href="https://youtube.com/@The_Ember" target="_blank" rel="noopener">THE EMBER <i class="fab fa-youtube"></i></a></p>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Try to get token from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            
+            // If no token in URL, show manual entry
+            if (!token) {
+                document.getElementById('auto-verify-message').classList.add('hidden');
+                document.getElementById('manual-verify').classList.remove('hidden');
+                
+                // For demo, try to get last token from localStorage
+                const lastToken = localStorage.getItem('lastVerificationToken');
+                if (lastToken) {
+                    document.getElementById('verify-token').value = lastToken;
+                }
+            } else {
+                // Auto-verify with token from URL
+                const result = window.auth.verify(token);
+                showVerificationResult(result);
+            }
+            
+            // Manual verification form
+            document.getElementById('verify-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const manualToken = document.getElementById('verify-token').value;
+                const result = window.auth.verify(manualToken);
+                showVerificationResult(result);
+            });
+            
+            function showVerificationResult(result) {
+                const resultEl = document.getElementById('verify-result');
+                
+                if (result.success) {
+                    resultEl.innerHTML = `
+                        <div class="success">
+                            <i class="fas fa-check-circle"></i>
+                            ${result.message}
+                        </div>
+                        <p>You will be redirected to the login page in <span id="countdown">5</span> seconds...</p>
+                    `;
+                    
+                    // Hide other content
+                    document.getElementById('auto-verify-message').classList.add('hidden');
+                    document.getElementById('manual-verify').classList.add('hidden');
+                    
+                    // Redirect countdown
+                    let seconds = 5;
+                    const countdownEl = document.getElementById('countdown');
+                    const interval = setInterval(() => {
+                        seconds--;
+                        countdownEl.textContent = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(interval);
+                            window.location.href = 'login.html';
+                        }
+                    }, 1000);
+                } else {
+                    resultEl.innerHTML = `
+                        <div class="error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            ${result.message}
+                        </div>
+                    `;
+                    
+                    // Show manual entry
+                    document.getElementById('auto-verify-message').classList.add('hidden');
+                    document.getElementById('manual-verify').classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -17,8 +17,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 300);
     
+    // Save score to user profile - prioritize simple leaderboard
+    if (window.simpleLeaderboard) {
+        console.log("Using simple leaderboard system...");
+        saveScoreToSimpleLeaderboard(quizResults);
+    } else if (window.auth && window.auth.isLoggedIn()) {
+        console.log("User is logged in, saving score to auth...");
+        saveScoreToProfile(quizResults);
+    } else {
+        console.log("No user logged in, score not saved");
+    }
+    
     // Set up the statistics cards
     setupStatCards(quizResults, isAssessment, difficulty);
+    
+    // Add leaderboard link for logged-in users
+    if (window.auth && window.auth.isLoggedIn()) {
+        addLeaderboardLink();
+    }
     
     // Set up the score donut chart
     setupScoreDonut(quizResults);
@@ -49,6 +65,161 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.location.href = 'quiz.html';
     });
+    
+    // Function to save score to user profile
+    function saveScoreToProfile(results) {
+        try {
+            // Try to save using the auth system first
+            if (window.auth && typeof window.auth.saveScore === 'function' && window.auth.isLoggedIn()) {
+                const saveResult = window.auth.saveScore(results);
+                console.log("Auth score save result:", saveResult);
+                return saveResult;
+            } 
+            // Fall back to simple leaderboard if available
+            else if (window.simpleLeaderboard && typeof window.simpleLeaderboard.saveScore === 'function') {
+                console.log("Using simple leaderboard to save score");
+                const saveResult = window.simpleLeaderboard.saveScore(results);
+                
+                // If we need a nickname, show a nickname form
+                if (saveResult.requiresNickname) {
+                    showNicknameForm(results);
+                    return { success: false, pendingSave: true };
+                }
+                
+                // If successful and has a shareable link, show it
+                if (saveResult.success && saveResult.shareableLink) {
+                    showShareableLink(saveResult.shareableLink);
+                }
+                
+                console.log("Simple leaderboard save result:", saveResult);
+                return saveResult;
+            } else {
+                console.error("No score saving mechanism available");
+                return { success: false, message: 'No score saving mechanism available' };
+            }
+        } catch (error) {
+            console.error("Error saving score:", error);
+            return { success: false, message: 'Error saving score', error };
+        }
+    }
+    
+    // Function to save score to simple leaderboard
+    function saveScoreToSimpleLeaderboard(results) {
+        try {
+            // Try simple leaderboard first
+            if (window.simpleLeaderboard && typeof window.simpleLeaderboard.saveScore === 'function') {
+                console.log("Saving to simple leaderboard");
+                const saveResult = window.simpleLeaderboard.saveScore(results);
+                
+                // If we need a nickname, show a nickname form
+                if (saveResult.requiresNickname) {
+                    showNicknameForm(results);
+                    return { success: false, pendingSave: true };
+                }
+                
+                // If successful and has a shareable link, show it
+                if (saveResult.success && saveResult.shareableLink) {
+                    showShareableLink(saveResult.shareableLink);
+                }
+                
+                return saveResult;
+            } else {
+                console.error("Simple leaderboard not available");
+                return { success: false, message: 'Simple leaderboard not available' };
+            }
+        } catch (error) {
+            console.error("Error saving score:", error);
+            return { success: false, message: 'Error saving score', error };
+        }
+    }
+    
+    // Function to show a nickname form
+    function showNicknameForm(results) {
+        // Create the form element
+        const formContainer = document.createElement('div');
+        formContainer.className = 'nickname-form-container';
+        formContainer.innerHTML = `
+            <div class="nickname-form-inner">
+                <h3>Enter a Nickname</h3>
+                <p>Set a nickname to save your score to the leaderboard:</p>
+                <div class="form-group">
+                    <input type="text" id="result-nickname-input" placeholder="Your nickname">
+                </div>
+                <div class="form-actions">
+                    <button id="save-nickname-btn" class="btn btn-primary">Save Score</button>
+                    <button id="cancel-nickname-btn" class="btn btn-secondary">Skip</button>
+                </div>
+            </div>
+        `;
+        
+        // Add to the page
+        document.body.appendChild(formContainer);
+        
+        // Add form event listeners
+        document.getElementById('save-nickname-btn').addEventListener('click', () => {
+            const nickname = document.getElementById('result-nickname-input').value.trim();
+            if (nickname) {
+                window.simpleLeaderboard.setNickname(nickname);
+                const saveResult = window.simpleLeaderboard.saveScore(results);
+                
+                // Remove the form
+                formContainer.remove();
+                
+                // Show shareable link if available
+                if (saveResult.success && saveResult.shareableLink) {
+                    showShareableLink(saveResult.shareableLink);
+                }
+                
+                // Add leaderboard link to actions if not already present
+                addLeaderboardLink();
+            } else {
+                alert('Please enter a valid nickname');
+            }
+        });
+        
+        document.getElementById('cancel-nickname-btn').addEventListener('click', () => {
+            formContainer.remove();
+        });
+    }
+    
+    // Function to show a shareable link
+    function showShareableLink(link) {
+        // Create the element
+        const linkContainer = document.createElement('div');
+        linkContainer.className = 'shareable-link-container';
+        linkContainer.innerHTML = `
+            <div class="shareable-link-inner">
+                <h3>Share Your Score</h3>
+                <p>Share this link to show off your score:</p>
+                <div class="link-group">
+                    <input type="text" id="shareable-link-input" value="${link}" readonly>
+                    <button id="copy-link-btn" class="btn btn-copy">Copy</button>
+                </div>
+                <button id="close-link-btn" class="btn btn-secondary">Close</button>
+            </div>
+        `;
+        
+        // Add to the page
+        document.body.appendChild(linkContainer);
+        
+        // Add event listeners
+        document.getElementById('copy-link-btn').addEventListener('click', () => {
+            const linkInput = document.getElementById('shareable-link-input');
+            linkInput.select();
+            document.execCommand('copy');
+            
+            // Show success feedback
+            const copyBtn = document.getElementById('copy-link-btn');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+            }, 2000);
+        });
+        
+        document.getElementById('close-link-btn').addEventListener('click', () => {
+            linkContainer.remove();
+        });
+    }
     
     function setupStatCards(results, isAssessment, difficulty) {
         const statsContainer = document.querySelector('.stat-cards');
@@ -286,4 +457,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const b = parseInt(hex.substring(4, 6), 16);
         return `${r}, ${g}, ${b}`;
     }
+    
+    function addLeaderboardLink() {
+        const actionsContainer = document.querySelector('.actions');
+        
+        if (actionsContainer && !document.getElementById('leaderboard-btn')) {
+            const leaderboardBtn = document.createElement('button');
+            leaderboardBtn.className = 'btn btn-secondary';
+            leaderboardBtn.id = 'leaderboard-btn';
+            leaderboardBtn.textContent = 'View Leaderboard';
+            
+            leaderboardBtn.addEventListener('click', () => {
+                window.location.href = 'leaderboard.html';
+            });
+            
+            actionsContainer.appendChild(leaderboardBtn);
+        }
+    }
+    
+    // Always add leaderboard link regardless of login status
+    addLeaderboardLink();
 });

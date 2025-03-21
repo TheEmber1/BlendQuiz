@@ -283,6 +283,23 @@ main {
     text-align: center;
 }
 
+/* Score saved indicator */
+.score-saved-indicator {
+    display: inline-block;
+    background-color: var(--correct-color);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.score-saved-indicator.visible {
+    opacity: 1;
+}
+
 /* Answers tabs and list */
 .answers-container {
     margin-bottom: 2rem;
