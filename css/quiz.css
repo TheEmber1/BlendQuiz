@@ -77,7 +77,7 @@ header {
     right: 10px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--main-color);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
@@ -92,7 +92,7 @@ header {
 
 .exit-button:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--secondary-color);
     transform: scale(1.1);
 }
 
