@@ -466,6 +466,35 @@ header h1 {
     transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    color: #999;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 1.5rem;
+}
+
+.creator-info {
+    margin-top: 0.8rem;
+}
+
+.creator-info a {
+    color: var(--main-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.creator-info a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.creator-info .fa-youtube {
+    color: #ff0000;
+    margin-left: 4px;
+}
+
 @media (max-width: 700px) {
     .container {
         padding: 1rem;

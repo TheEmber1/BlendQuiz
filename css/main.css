@@ -275,6 +275,27 @@ copyright {
     color: #666;
 }
 
+.creator-info {
+    margin-top: 0.8rem;
+}
+
+.creator-info a {
+    color: var(--main-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.creator-info a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.creator-info .fa-youtube {
+    color: #ff0000;
+    margin-left: 4px;
+}
+
 @media (max-width: 768px) {
     .buttons-grid {
         grid-template-columns: 1fr;

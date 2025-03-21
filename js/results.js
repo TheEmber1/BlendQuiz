@@ -168,7 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 question: questionText,
                 answer: item.answer,
                 isCorrect: true,
-                isBonus: item.isBonus
+                // Keep isBonus property only for assessment mode
+                isBonus: isAssessment ? item.isBonus : false
             });
         });
         
@@ -180,7 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 answer: item.correctAnswer,
                 userAnswer: item.userAnswer,
                 isCorrect: false,
-                isBonus: item.isBonus
+                // Keep isBonus property only for assessment mode
+                isBonus: isAssessment ? item.isBonus : false
             });
         });
         

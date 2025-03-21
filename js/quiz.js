@@ -106,14 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Function to generate regular quiz questions
     function generateQuestions(shortcuts) {
-        // Regular quiz will have 7 questions total (5 from selected difficulty + 2 pro)
-        state.totalQuestions = 7;
+        // Regular quiz will have 8 questions total (all from selected difficulty)
+        state.totalQuestions = 8;
         
         // Shuffle shortcuts to get random set
         const shuffledShortcuts = [...shortcuts].sort(() => Math.random() - 0.5);
         
-        // Take the first 5 shortcuts (or fewer if not enough)
-        const questionCount = Math.min(5, shuffledShortcuts.length);
+        // Take the first 8 shortcuts (or fewer if not enough)
+        const questionCount = Math.min(8, shuffledShortcuts.length);
         
         // Create array to hold our questions
         const questionsArray = [];
@@ -131,42 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 options: shuffleArray([...incorrectOptions, correctShortcut.key]),
                 difficulty: difficulty
             });
-        }
-        
-        // Now add 2 Pro level questions at the end
-        // Get Pro shortcuts and shuffle them
-        const proShortcuts = [...shortcutsByDifficulty.pro].sort(() => Math.random() - 0.5);
-        
-        // Take 2 Pro shortcuts that aren't already used
-        let bonusCount = 0;
-        let proIndex = 0;
-        
-        while (bonusCount < 2 && proIndex < proShortcuts.length) {
-            const proShortcut = proShortcuts[proIndex];
-            
-            // Check if this shortcut is already used in our questions
-            const isAlreadyUsed = questionsArray.some(q => 
-                q.correctAnswer === proShortcut.key || 
-                q.question.includes(proShortcut.action)
-            );
-            
-            if (!isAlreadyUsed) {
-                // Generate incorrect options
-                const incorrectOptions = generateIncorrectOptions(proShortcut);
-                
-                // Add the Pro question
-                questionsArray.push({
-                    question: `What is the shortcut for "${proShortcut.action}"?`,
-                    correctAnswer: proShortcut.key,
-                    options: shuffleArray([...incorrectOptions, proShortcut.key]),
-                    difficulty: 'pro',
-                    isBonus: true
-                });
-                
-                bonusCount++;
-            }
-            
-            proIndex++;
         }
         
         // Set the questions in our state
@@ -208,13 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update progress bar
         updateProgressBar();
         
-        // Check if this is a bonus pro question and add a visual indicator
-        if (question.isBonus) {
-            document.getElementById('question').innerHTML = 
-                `<span class="bonus-tag">BONUS PRO</span> ${question.question}`;
-        } else {
-            document.getElementById('question').textContent = question.question;
-        }
+        // Display the question without any bonus tag
+        document.getElementById('question').textContent = question.question;
         
         // Set answer options
         const answerButtons = document.querySelectorAll('.answer-btn');
@@ -398,14 +357,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 timeBonus = 5;  // Average speed
             }
         } else {
-            // For regular quiz (5 questions)
-            if (timeTaken < 15) {
-                timeBonus = 20; // Perfect speed - 15 seconds for 5 questions
-            } else if (timeTaken < 30) {
+            // For regular quiz (now 8 questions)
+            if (timeTaken < 24) {
+                timeBonus = 20; // Perfect speed - ~3 seconds per question
+            } else if (timeTaken < 48) {
                 timeBonus = 15; // Very good speed
-            } else if (timeTaken < 45) {
+            } else if (timeTaken < 72) {
                 timeBonus = 10; // Good speed
-            } else if (timeTaken < 60) {
+            } else if (timeTaken < 96) {
                 timeBonus = 5;  // Average speed
             }
         }
