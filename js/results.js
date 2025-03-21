@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 300);
     
+    // Save results to localStorage for Personal Best tracking
+    saveResultsToLocalStorage(quizResults, isAssessment, difficulty);
+    
     // Set up the statistics cards
     setupStatCards(quizResults, isAssessment, difficulty);
     
@@ -285,5 +288,57 @@ document.addEventListener('DOMContentLoaded', () => {
         const g = parseInt(hex.substring(2, 4), 16);
         const b = parseInt(hex.substring(4, 6), 16);
         return `${r}, ${g}, ${b}`;
+    }
+    
+    // Function to save results to localStorage for personal best tracking
+    function saveResultsToLocalStorage(results, isAssessment, difficulty) {
+        // Only save full skill assessments
+        if (!isAssessment) return;
+        
+        try {
+            // Create simplified version of results to save
+            const resultToSave = {
+                timestamp: new Date().toISOString(),
+                scorePoints: results.scorePoints,
+                correctCount: results.correct.length,
+                totalQuestions: results.totalQuestions,
+                completionTime: results.completionTime,
+                skillLevel: results.skillLevel ? results.skillLevel.title : null
+            };
+            
+            // Get existing scores or initialize empty array
+            let savedScores = JSON.parse(localStorage.getItem('assessmentScores') || '[]');
+            
+            // Add new score
+            savedScores.push(resultToSave);
+            
+            // Sort by score points (highest first)
+            savedScores.sort((a, b) => b.scorePoints - a.scorePoints);
+            
+            // Keep only the 5 most recent scores
+            if (savedScores.length > 5) {
+                // First, identify the highest score to keep
+                const personalBest = savedScores[0];
+                
+                // Then sort by timestamp (newest first)
+                savedScores.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                // Keep only the 4 most recent + personal best (if different)
+                savedScores = savedScores.slice(0, 4);
+                
+                // Make sure personal best is included if it wasn't in the most recent 4
+                if (!savedScores.some(score => score.timestamp === personalBest.timestamp)) {
+                    savedScores.push(personalBest);
+                }
+                
+                // Sort again by score points
+                savedScores.sort((a, b) => b.scorePoints - a.scorePoints);
+            }
+            
+            // Save back to localStorage
+            localStorage.setItem('assessmentScores', JSON.stringify(savedScores));
+        } catch (error) {
+            console.error('Error saving scores to localStorage:', error);
+        }
     }
 });
