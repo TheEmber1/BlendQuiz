@@ -197,6 +197,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.style.display = 'none';
             }
         });
+        
+        // Make sure exit button is visible during the quiz
+        const exitButton = document.getElementById('exit-button');
+        if (exitButton) {
+            exitButton.style.display = 'block';
+        }
     }
     
     // Add function to update progress bar
@@ -271,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             state.currentQuestion++;
             displayQuestion();
-        }, 1800); // Increased delay to allow animations to complete
+        }, 1000); // Reduced from 1000ms to 500ms for faster transitions
     }
     
     // Small helper function to play sounds if we add them later
@@ -499,4 +505,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const b = parseInt(hex.substring(4, 6), 16);
         return `${r}, ${g}, ${b}`;
     }
+    
+    // Add exit button setup to DOMContentLoaded
+    setupExitButton();
 });
+
+// Add function to handle exit button click
+function setupExitButton() {
+    const exitButton = document.getElementById('exit-button');
+    if (exitButton) {
+        exitButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to quit? All progress will be lost.')) {
+                window.location.href = 'index.html';
+            }
+        });
+    }
+}
